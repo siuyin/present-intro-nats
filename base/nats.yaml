@@ -1,0 +1,144 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nats
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: nats
+#  ports:
+#    - protocol: TCP
+#      port: 4222
+#      targetPort: 4222
+#      name: nats
+#    - protocol: TCP
+#      port: 8222
+#      targetPort: 8222
+#      name: mon
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nats2
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: nats2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nats3
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: nats3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nats
+  labels:
+    app: nats
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nats
+  template:
+    metadata:
+      labels:
+        app: nats
+    spec:
+      containers:
+      - name: nats
+        image: nats:2.2.5
+        args: ["--jetstream","--store_dir=/dat/nats","--http_port=8222","--name=nats","--cluster=nats://0.0.0.0:6222","--cluster_name=nats","--routes=nats://nats:6222"]
+        volumeMounts:
+        - mountPath: "/dat"
+          name: dat
+      volumes:
+      - name: dat
+        persistentVolumeClaim:
+          claimName: nats1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nats2
+  labels:
+    app: nats2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nats2
+  template:
+    metadata:
+      labels:
+        app: nats2
+    spec:
+      containers:
+      - name: nats2
+        image: nats:2.2.5
+        args: ["--jetstream","--store_dir=/dat/nats","--http_port=8222","--name=nats2","--cluster=nats://0.0.0.0:6222","--cluster_name=nats","--routes=nats://nats:6222"]
+        volumeMounts:
+        - mountPath: "/dat"
+          name: dat
+      volumes:
+      - name: dat
+        persistentVolumeClaim:
+          claimName: nats2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nats3
+  labels:
+    app: nats3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nats3
+  template:
+    metadata:
+      labels:
+        app: nats3
+    spec:
+      containers:
+      - name: nats3
+        image: nats:2.2.5
+        args: ["--jetstream","--store_dir=/dat/nats","--http_port=8222","--name=nats3","--cluster=nats://0.0.0.0:6222","--cluster_name=nats","--routes=nats://nats:6222"]
+        volumeMounts:
+        - mountPath: "/dat"
+          name: dat
+      volumes:
+      - name: dat
+        persistentVolumeClaim:
+          claimName: nats3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nats-box
+  labels:
+    app: nats-box
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nats-box
+  template:
+    metadata:
+      labels:
+        app: nats-box
+    spec:
+      containers:
+      - name: nats-box
+        image: natsio/nats-box:0.6.0
+        command: ["/bin/sh","-lc"]
+        args: ["sleep 1000000"]

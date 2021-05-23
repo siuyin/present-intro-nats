@@ -1,0 +1,106 @@
+# Introduction to NATS
+23 May 2021
+
+Loh Siu Yin
+siuyin@xendit.co
+
+## NATS: Simple Publish and Subscribe
+
+Let's first provision a NATS server.
+In this case a 3-node NATS cluster.
+
+```
+export KUBECONFIG=/h/.kube/local.microk8s  # point to the correct kubernetes
+
+kubectl apply -f base/nats.yaml
+```
+
+And see what pods we have:
+
+```
+kubectl get pods
+```
+
+nats-box is command line utility that publishes and subscribes
+to NATS and more.
+
+Give me a minute to setup the screen.
+
+```
+export KUBECONFIG=/h/.kube/local.microk8s
+kubectl get pod |grep nats-box
+kubectl exec -it  XXXX -- /bin/sh -l
+```
+
+## Let's Publish!
+Think of publishing as broadcasting in to a radio channel.
+In this case the `test.x` radio channel.
+
+The servers in my NATS cluster are named nats, nats2 and nats3.
+
+```
+nats -s nats2 pub 'test.x' x1
+```
+---
+
+Now let's have a subscriber "tune-in".
+```
+nats -s nats3 sub 'test.x'
+```
+
+Why didn't the subscriber receive the message?
+-- The subscriber tuned in late.
+
+
+Now let's have another subscriber "tune-in" to ALL test channels.
+```
+nats -s nats3 sub 'test.>'
+```
+
+## NATS delivers messages  "at most once"
+If a tree falls in a forest, and no one is around ...
+
+If we publish on NATS and no one subscribes,
+the message disappears into thin air.
+
+---
+
+Can NATS do better?
+
+It certainly can! Just enable Jetstream within NATS itself.
+
+```
+docker run --rm -it nats:2.2.5 --jetstream
+```
+
+The NATS cluster deployed to kubernetes already has jetstream enabled.
+
+## Let's record our messages into a stream
+Think of a stream as a log file. I will create a stream called `tst`.
+
+First we need to feed that stream with a source of messages.
+A NATS Stream has some interesting properties.
+```
+nats -s nats stream add
+
+
+nats -s nats stream info tst
+
+nats -s nats pub test.x x1
+nats -s nats stream view tst
+
+nats -s nats pub test.x.y xy2
+nats -s nats req test.x x3
+```
+
+## We have logged a Stream. How do we use it?
+I will create two consumers, one only interested in `test.x` .
+
+And the other interested in all of `test`.
+
+```
+nats -s nats consumer add
+
+nats -s nats2 consumer next tst x   --timeout=1h
+nats -s nats3 consumer next tst all --timeout=1h
+```

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bb
+  labels:
+    app: bb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bb
+  template:
+    metadata:
+      labels:
+        app: bb
+    spec:
+      containers:
+      - name: bb
+        image: busybox
+        command: ["sleep","1000000000"]
+        volumeMounts:
+        - mountPath: "/dat"
+          name: dat
+      terminationGracePeriodSeconds: 2
+      volumes:
+      - name: dat
+        persistentVolumeClaim:
+          claimName: nats1
+

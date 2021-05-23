@@ -1,0 +1,97 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nats-storage
+provisioner: kubernetes.io/no-provisioner
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nats1
+spec:
+  storageClassName: "nats-storage"
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 1G
+  hostPath:
+    path: /data/nats1
+  claimRef:
+    name: nats1
+    namespace: siuyin
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nats2
+spec:
+  storageClassName: "nats-storage"
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 1G
+  hostPath:
+    path: /data/nats2
+  claimRef:
+    name: nats2
+    namespace: siuyin
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nats3
+spec:
+  storageClassName: "nats-storage"
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 1G
+  hostPath:
+    path: /data/nats3
+  claimRef:
+    name: nats3
+    namespace: siuyin
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nats1
+  namespace: siuyin
+spec:
+  storageClassName: "nats-storage"
+  volumeName: nats1
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1G
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nats2
+  namespace: siuyin
+spec:
+  storageClassName: "nats-storage"
+  volumeName: nats2
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1G
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nats3
+  namespace: siuyin
+spec:
+  storageClassName: "nats-storage"
+  volumeName: nats3
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1G
