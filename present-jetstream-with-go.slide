@@ -1,0 +1,42 @@
+# Using NATS Jetstream with Go
+23 May 2021
+
+Loh Siu Yin
+Engineering Manager, Xendit
+siuyin@xendit.co
+
+## Connecting to NATS from localhost
+Port forward to the NATS server:
+
+.code forward-ports.sh
+
+```
+ ./forward-ports.sh
+```
+
+## If you want to follow along ...
+
+Presentation source and code are available here:
+
+.link https://github.com/siuyin/present-intro-nats
+
+## Hello Jetstream
+Now, get a jetstream manager instance.
+
+.code cmd/hello/main.go /func main\(/,/^}/
+
+```
+go run cmd/hello/main.go
+```
+
+## Creating and deleting a stream
+
+.code cmd/stream/main.go /func main\(/,/^}/
+
+```
+go run cmd/stream/main.go
+```
+
+## Presentation and code download
+
+.link https://github.com/siuyin/present-intro-nats
