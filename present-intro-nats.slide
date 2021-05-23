@@ -2,6 +2,7 @@
 23 May 2021
 
 Loh Siu Yin
+Engineering Manager, Xendit
 siuyin@xendit.co
 
 ## NATS: Simple Publish and Subscribe
@@ -32,20 +33,26 @@ kubectl get pod |grep nats-box
 kubectl exec -it  XXXX -- /bin/sh -l
 ```
 
+## If you want to follow along ...
+
+Presentation source and code are available here:
+
+.link https://github.com/siuyin/present-intro-nats
+
 ## Let's Publish!
-Think of publishing as broadcasting in to a radio channel.
+Think of publishing as broadcasting to a radio channel.
 In this case the `test.x` radio channel.
 
 The servers in my NATS cluster are named nats, nats2 and nats3.
 
 ```
-nats -s nats2 pub 'test.x' x1
+nats -s nats pub 'test.x' x1
 ```
 ---
 
 Now let's have a subscriber "tune-in".
 ```
-nats -s nats3 sub 'test.x'
+nats -s nats2 sub 'test.x'
 ```
 
 Why didn't the subscriber receive the message?
@@ -76,7 +83,7 @@ docker run --rm -it nats:2.2.5 --jetstream
 The NATS cluster deployed to kubernetes already has jetstream enabled.
 
 ## Let's record our messages into a stream
-Think of a stream as a log file. I will create a stream called `tst`.
+Think of a stream as a log file. I will create a stream named `tst`.
 
 First we need to feed that stream with a source of messages.
 A NATS Stream has some interesting properties.
@@ -104,3 +111,28 @@ nats -s nats consumer add
 nats -s nats2 consumer next tst x   --timeout=1h
 nats -s nats3 consumer next tst all --timeout=1h
 ```
+
+## Other stream functions
+
+```
+nats -s nats str report
+nats -s nats s view tst 3
+nats -s nats s rmm tst N
+
+nats -s nats consumer list tst
+nats -s nats c copy tst all all1
+nats -s nats3 consumer next tst all1 --timeout=1h
+
+nats -s nats s purge tst
+nats -s nats s rm tst
+
+```
+
+Clean up
+```
+kubectl delete -f base/nats.yaml
+```
+
+## Presentation and code download
+
+.link https://github.com/siuyin/present-intro-nats
