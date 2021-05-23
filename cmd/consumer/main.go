@@ -23,7 +23,7 @@ func main() {
 	defer st.Delete()
 	pubDat("test.x")
 
-	cons := xConsumer(mgr, st.Name())
+	cons := xConsumer(st)
 	consumeDat(st, cons)
 
 }
@@ -58,12 +58,15 @@ func tstStream(mgr *jsm.Manager) *jsm.Stream {
 func pubDat(subj string) {
 	for i := 0; i < 10; i++ {
 		msg := fmt.Sprintf("Msg %d", i)
-		nc.Publish(subj, []byte(msg))
+		_, err := nc.Request(subj, []byte(msg), time.Second)
+		if err != nil {
+			log.Fatalf("could not request to publish: %v", err)
+		}
 	}
 }
 
-func xConsumer(mgr *jsm.Manager, stream string) *jsm.Consumer {
-	c, err := mgr.NewConsumer(stream,
+func xConsumer(st *jsm.Stream) *jsm.Consumer {
+	c, err := st.NewConsumer(
 		jsm.DurableName("x"),
 	)
 	if err != nil {
