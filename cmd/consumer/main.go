@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/nats-io/jsm.go"
@@ -72,15 +73,22 @@ func xConsumer(mgr *jsm.Manager, stream string) *jsm.Consumer {
 }
 
 func consumeDat(st *jsm.Stream, cons *jsm.Consumer) {
+	var wg sync.WaitGroup
 	start := time.Now()
 	for i := 0; i < 10; i++ {
-		m, err := cons.NextMsg()
-		if err != nil {
-			log.Printf("could not get next message: %v", err)
-			return
-		}
-		fmt.Printf("%s\n", m.Data)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			m, err := cons.NextMsg()
+			time.Sleep(1 * time.Second) // simulate slow processing
+			if err != nil {
+				log.Printf("could not get next message: %v", err)
+				return
+			}
+			fmt.Printf("%s\n", m.Data)
+		}()
 	}
+	wg.Wait()
 	dur := time.Now().Sub(start)
 	fmt.Printf("Message processing time: %v ms\n", dur.Milliseconds())
 }
