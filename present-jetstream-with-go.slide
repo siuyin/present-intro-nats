@@ -45,6 +45,32 @@ cmd/stream/main.go:
 go run cmd/stream/main.go -help
 ```
 
+## Use the stream via nats-box
+
+```
+export KUBECONFIG=/h/.kube/local.microk8s
+kubectl get pods
+kubectl exec -it POD -- /bin/sh -l
+```
+
+---
+
+
+```
+nats -s nats stream list
+
+nats -s nats s info tst
+```
+
+---
+
+```
+nats -s nats req test t1
+nats -s nats req test.x.y.z xyz2
+nats -s nats s view tst
+```
+
+
 ## Presentation and code download
 
 .link https://github.com/siuyin/present-intro-nats
