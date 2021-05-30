@@ -26,5 +26,6 @@ func main() {
 		strm.Create(js, strName)
 		return
 	}
+
 	strm.Delete(js, strName)
 }

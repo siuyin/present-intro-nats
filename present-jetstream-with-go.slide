@@ -34,11 +34,14 @@ cmd/stream/main.go:
 
 .code cmd/stream/main.go /func main\(/,/^}/
 
-## createStream and deleteStream
+I wrote the `strm` package to provide convenience functions to
+manipulate NATS JetStreams.
 
-.code cmd/stream/main.go /func createStream\(/,/^}/
+## strm package: Create and Delete
 
-.code cmd/stream/main.go /func deleteStream\(/,/^}/
+.code strm/strm.go /func Create\(/,/^}/
+
+.code strm/strm.go /func Delete\(/,/^}/
 
 
 ```
@@ -69,6 +72,22 @@ nats -s nats req test t1
 nats -s nats req test.x.y.z xyz2
 nats -s nats s view tst
 ```
+
+## Publish to the stream with Go
+JetStream publishes are by default, acknowledged.
+
+If an acknowledgement is received, this confirms JetStream has received the message.
+
+.code cmd/jspub/main.go /func main\(/,/^}/
+
+
+```
+go run cmd/jspub/main.go
+```
+
+## Creating a stream consumer
+
+.code cmd/jscons/main.go
 
 
 ## Presentation and code download

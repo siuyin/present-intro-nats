@@ -59,3 +59,16 @@ func Delete(js nats.JetStreamContext, name string) {
 		log.Printf("error deleting stream: %v", err)
 	}
 }
+
+func AddConsumer(js nats.JetStreamContext, strName, consName, consFilter string) {
+	info, err := js.AddConsumer(strName, &nats.ConsumerConfig{
+		Durable:       consName,
+		AckPolicy:     nats.AckExplicitPolicy,
+		MaxAckPending: 1,
+		FilterSubject: consFilter,
+	})
+	if err != nil {
+		log.Panicf("could not add consumer: %v", err)
+	}
+	prettyPrint(info)
+}
