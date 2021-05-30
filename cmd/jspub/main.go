@@ -21,7 +21,10 @@ func main() {
 
 }
 
-func publish(js nats.JetStreamContext, subj string, f func() []byte) {
+func publish(js nats.JetStreamContext,
+	subj string,
+	f func() []byte, // f is a function that returns the message to be published
+) {
 	ack, err := js.Publish(subj, f())
 	if err != nil {
 		log.Printf("publish error: %v", err)

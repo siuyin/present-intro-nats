@@ -11,6 +11,6 @@ func main() {
 	defer nc.Close()
 
 	const strName = "tst"
-	//strm.AddConsumer(js, strName, "test-dot", "test.>")
+	strm.AddConsumer(js, strName, "test-dot", "test.>")
 	strm.AddConsumer(js, strName, "test", "test")
 }

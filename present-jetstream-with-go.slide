@@ -1,5 +1,5 @@
 # Using NATS JetStream with Go
-23 May 2021
+30 May 2021
 
 Loh Siu Yin
 Engineering Manager, Xendit
@@ -85,11 +85,76 @@ If an acknowledgement is received, this confirms JetStream has received the mess
 go run cmd/jspub/main.go
 ```
 
+## publish
+
+.code cmd/jspub/main.go /func publish\(/,/^}/
+
+.code cmd/jspub/main.go /func testMsg\(/,/^}/
+
+.code cmd/jspub/main.go /func testXYZMsg\(/,/^}/
+
 ## Creating a stream consumer
 
 .code cmd/jscons/main.go
+
+## Use the stream consumer via nats-box
+
+```
+nats -s nats consumer list tst
+
+nats -s nats con info tst test-dot
+
+nats -s nats con next tst test-dot
+nats -s nats con next tst test
+```
+
+## Consuming the stream with Go
+
+.code cmd/consume/main.go /func main\(/,/^}/
+
+## showMsgs goroutine
+
+.code cmd/consume/main.go /func showMsgs\(/,/^}/
+.code cmd/consume/main.go /func fetch\(/,/^}/
+
+## Demo
+Clean up by removing the example stream
+
+```
+go run cmd/stream/main.go -delete
+```
+
+To set up test environment again:
+
+```
+go run cmd/stream/main.go     # create tst stream
+go run cmd/jspub/main.go      # publish into stream
+go run cmd/jscons/main.go     # create "tst test" and "tst test-dot" consumers
+```
+
+---
+
+```
+go run cmd/jspub/main.go      # publish into tst stream
+
+go run cmd/consume/main.go    # create "tst test-go" as it does not already exist
+```
+
+---
+
+```
+nats -s nats con ls tst
+
+nats -s nats con next tst test
+
+nats -s nats con next tst test-dot --timeout=1s
+```
+
+
+
 
 
 ## Presentation and code download
 
 .link https://github.com/siuyin/present-intro-nats
+
