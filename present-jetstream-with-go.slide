@@ -1,4 +1,4 @@
-# Using NATS Jetstream with Go
+# Using NATS JetStream with Go
 23 May 2021
 
 Loh Siu Yin
@@ -20,8 +20,8 @@ Presentation source and code are available here:
 
 .link https://github.com/siuyin/present-intro-nats
 
-## Hello Jetstream
-Now, get a jetstream manager instance.
+## Hello JetStream
+Get a context to manage JetStream.
 
 .code cmd/hello/main.go /func main\(/,/^}/
 
@@ -29,12 +29,20 @@ Now, get a jetstream manager instance.
 go run cmd/hello/main.go
 ```
 
-## Creating and deleting a stream
+## Create or delete a Stream
+cmd/stream/main.go:
 
 .code cmd/stream/main.go /func main\(/,/^}/
 
+## createStream and deleteStream
+
+.code cmd/stream/main.go /func createStream\(/,/^}/
+
+.code cmd/stream/main.go /func deleteStream\(/,/^}/
+
+
 ```
-go run cmd/stream/main.go
+go run cmd/stream/main.go -help
 ```
 
 ## Presentation and code download

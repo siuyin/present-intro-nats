@@ -2,40 +2,39 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 
-	"github.com/nats-io/jsm.go"
 	"github.com/nats-io/nats.go"
 	"github.com/siuyin/dflt"
 )
 
-var nc *nats.Conn
+var (
+	nc         *nats.Conn
+	deleteMode bool
+)
 
-func main() {
-	fmt.Println("Create a Stream")
-	mgr := jsmMgr()
-	defer nc.Close()
-
-	const maxDur = 1<<63 - 1
-	st, err := mgr.NewStream("tst", jsm.Subjects("test.>"),
-		jsm.MaxAge(maxDur), jsm.FileStorage())
-	if err != nil {
-		log.Fatalf("could not create stream: %v", err)
-	}
-
-	fmt.Println("Stream Info")
-	inf, err := st.Information()
-	if err != nil {
-		log.Fatalf("could not get stream info: %v", err)
-	}
-	prettyPrint(inf)
-
-	fmt.Println("Delete a Stream")
-	st.Delete()
+func init() {
+	flag.BoolVar(&deleteMode, "delete", false,
+		`Deletes example JetStream instead of creating it.
+If this flag is not provided, it creates an example stream.`)
+	flag.Parse()
 }
 
-func jsmMgr() *jsm.Manager {
+func main() {
+	js := jsCtx()
+	defer nc.Close()
+
+	const strName = "tst"
+	if !deleteMode {
+		createStream(js, strName)
+		return
+	}
+	deleteStream(js, strName)
+}
+
+func jsCtx() nats.JetStreamContext {
 	var err error
 	natsURL := dflt.EnvString("NATS_URL", "nats://127.0.0.1:4222")
 	nc, err = nats.Connect(natsURL)
@@ -43,12 +42,28 @@ func jsmMgr() *jsm.Manager {
 		log.Fatalf("could not connect to NATS: %v", err)
 	}
 
-	mgr, err := jsm.New(nc)
+	js, err := nc.JetStream()
 	if err != nil {
-		log.Fatal("could not create jetstream manager: %v", err)
+		log.Fatal("could not create JetStream context: %v", err)
 	}
 
-	return mgr
+	return js
+}
+
+func createStream(js nats.JetStreamContext, name string) *nats.StreamInfo {
+	fmt.Printf("Creating stream: %q\n", name)
+	strInfo, err := js.AddStream(&nats.StreamConfig{
+		Name:     name,
+		Subjects: []string{"test.>", "test"},
+		MaxAge:   0, // 0 means keep forever
+		Storage:  nats.FileStorage,
+	})
+	if err != nil {
+		log.Panicf("could not create stream: %v", err)
+	}
+
+	prettyPrint(strInfo)
+	return strInfo
 }
 
 func prettyPrint(x interface{}) {
@@ -57,4 +72,11 @@ func prettyPrint(x interface{}) {
 		log.Fatalf("could not prettyPrint: %v", err)
 	}
 	fmt.Println(string(b))
+}
+
+func deleteStream(js nats.JetStreamContext, name string) {
+	fmt.Printf("Deleting stream: %q\n", name)
+	if err := js.DeleteStream(name); err != nil {
+		log.Printf("error deleting stream: %v", err)
+	}
 }

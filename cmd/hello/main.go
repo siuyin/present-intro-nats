@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/nats-io/jsm.go"
 	"github.com/nats-io/nats.go"
 	"github.com/siuyin/dflt"
 )
 
 func main() {
-	fmt.Println("Hello Jetstream")
+	fmt.Println("Hello JetStream")
 
 	natsURL := dflt.EnvString("NATS_URL", "localhost:4222")
 	nc, err := nats.Connect(natsURL)
@@ -19,10 +18,10 @@ func main() {
 	}
 	defer nc.Close()
 
-	mgr, err := jsm.New(nc)
+	js, err := nc.JetStream()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(mgr)
+	fmt.Println("JetStream context:", js)
 }
