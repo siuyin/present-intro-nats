@@ -20,6 +20,12 @@ Presentation source and code are available here:
 
 .link https://github.com/siuyin/present-intro-nats
 
+---
+
+Introduction to NATS (and Jetstream)
+
+.link https://youtu.be/umUnwkmLaec
+
 ## Hello JetStream
 Get a context to manage JetStream.
 
